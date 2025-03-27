@@ -7,7 +7,7 @@ class PidFile
 
   DEFAULT_OPTIONS = {
     :pidfile => File.basename($0, File.extname($0)) + ".pid",
-    :piddir => '/var/run',
+    :piddir => '/tmp',
   }
 
   def initialize(*args)
@@ -37,7 +37,7 @@ class PidFile
     if self.pidfile_exists?
       if self.class.running?(@pidpath)
         raise DuplicateProcessError, "Process (#{$0} - #{self.class.pid(@pidpath)}) is already running."
-        
+
         exit! # exit without removing the existing pidfile
       end
 
@@ -106,7 +106,7 @@ class PidFile
   def self.pidfile_exists?(path=nil)
     path ||= File.join(DEFAULT_OPTIONS[:piddir], DEFAULT_OPTIONS[:pidfile])
 
-    File.exists?(path)
+    File.exist?(path)
   end
 
   # boolean stating whether the calling program is already running

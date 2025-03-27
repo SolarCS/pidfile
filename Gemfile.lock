@@ -1,0 +1,18 @@
+PATH
+  remote: .
+  specs:
+    pidfile (0.3.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  arm64-darwin-21
+  x86_64-linux
+
+DEPENDENCIES
+  pidfile!
+
+BUNDLED WITH
+   2.4.21
