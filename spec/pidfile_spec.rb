@@ -14,9 +14,9 @@ describe PidFile do
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#
 
   it "should set defaults upon instantiation" do
-    @pidfile.pidfile.should == "rspec.pid"
-    @pidfile.piddir.should == "/tmp"
-    @pidfile.pidpath.should == "/tmp/rspec.pid"
+    expect(@pidfile.pidfile).to eq "rspec.pid"
+    expect(@pidfile.piddir).to eq "/tmp"
+    expect(@pidfile.pidpath).to eq "/tmp/rspec.pid"
   end
 
   it "should secure pidfiles left behind and recycle them for itself" do
@@ -24,67 +24,65 @@ describe PidFile do
     fakepid = 99999999 # absurd number
     open("/tmp/foo.pid", "w") {|f| f.puts fakepid }
     pf = PidFile.new(:pidfile => "foo.pid")
-    PidFile.pid(pf.pidpath).should == Process.pid
-    pf.should be_an_instance_of PidFile
-    pf.pid.should_not == fakepid
-    pf.pid.should be_a_kind_of Integer
+    expect(PidFile.pid(pf.pidpath)).to eq Process.pid
+    expect(pf).to be_instance_of(PidFile)
+    expect(pf.pid).not_to eq fakepid
+    expect(pf.pid).to be_a_kind_of(Integer)
     pf.release
   end
 
   it "should create a pid file upon instantiation" do
-    File.exists?(@pidfile.pidpath).should be_true
+    expect(File.exist?(@pidfile.pidpath)).to eq true
   end
 
   it "should create a pidfile containing same PID as process" do
-    @pidfile.pid.should == Process.pid
+    expect(@pidfile.pid).to eq Process.pid
   end
 
   it "should know if pidfile exists or not" do
-    @pidfile.pidfile_exists?.should be_true
+    expect(@pidfile.pidfile_exists?).to eq true
     @pidfile.release
-    @pidfile.pidfile_exists?.should be_false
+    expect(@pidfile.pidfile_exists?).to eq false
   end
 
   it "should be able to tell if a process is running" do
-    @pidfile.alive?.should be_true
+    expect(@pidfile.alive?).to eq true
   end
 
   it "should remove the pidfile when the calling application exits" do
     fork do
       exit
     end
-    PidFile.pidfile_exists?.should be_false
+    Process.wait
+    expect(PidFile.pidfile_exists?).to eq false
   end
 
   it "should raise an error if a pidfile already exists" do
-    lambda { PidFile.new(:pidfile => "rspec.pid") }.should raise_error
+    expect(lambda { PidFile.new(:pidfile => "rspec.pid") }).to raise_error
   end
 
   it "should know if a process exists or not - Class method" do
-    PidFile.running?('/tmp/rspec.pid').should be_true
-    PidFile.running?('/tmp/foo.pid').should be_false
+    expect(PidFile.running?('/tmp/rspec.pid')).to eq true
+    expect(PidFile.running?('/tmp/foo.pid')).to eq false
   end
 
   it "should know if it is running - Class method" do
-    pf = PidFile.new
-    PidFile.running?.should be_true
-    pf.release
-    PidFile.running?.should be_false
+    expect(PidFile.running?).to eq true
   end
 
   it "should know if it's alive or not" do
-    @pidfile.alive?.should be_true
+    expect(@pidfile.alive?).to eq true
     @pidfile.release
-    @pidfile.alive?.should be_false
+    expect(@pidfile.alive?).to eq false
   end
 
   it "should remove pidfile and set pid to nil when released" do
     @pidfile.release
-    @pidfile.pidfile_exists?.should be_false
-    @pidfile.pid.should be_nil
+    expect(@pidfile.pidfile_exists?).to eq false
+    expect(@pidfile.pid).to eq nil
   end
 
   it "should give a DateTime value for locktime" do
-    @pidfile.locktime.should be_an_instance_of Time
+    expect(@pidfile.locktime).to be_instance_of(Time)
   end
 end
